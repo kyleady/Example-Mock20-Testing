@@ -1,0 +1,25 @@
+{
+  "name": "mock20-testing-eval",
+  "version": "1.0.0",
+  "description": "Creates an example Roll20 project that uses the Mock20 module to test its scripts.",
+  "main": "MyScript.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npm run compile_script && npm run compile_module && mocha --recursive",
+    "compile_script": "echo \"\" > MyScript.js && find ./Scripts -type f -exec cat {} + >> MyScript.js",
+    "compile_module": "echo \"require('mock20')\" > MyModule.js && cat MyScript.js >> MyModule.js && echo \"MOCK20endOfLastScript();\" >> MyModule.js"
+  },
+  "keywords": [
+    "Roll20",
+    "Mock20"
+  ],
+  "author": "Kyle Smith <kyledavidady@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "mock20": "^1.0.2"
+  }
+}
