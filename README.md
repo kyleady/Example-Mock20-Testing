@@ -4,6 +4,10 @@ An example [Roll20](https://roll20.net/) project that uses the [Mock20](https://
 
 # Usage
 
+#### Platform
+
+`npm test` uses linux commands to compile the javascript files inside the `Scripts` folder into a new `MyScripts.js` file. You will either have to run `npm test` on a linux platform or through a linux terminal such as [Ubuntu for Windows](https://www.microsoft.com/en-us/store/p/ubuntu/9nblggh4msv6).
+
 #### npm test
 
 When running tests on this script through node, the project will compile every javascript file within the Scripts folder into the `MyScript.js` file. It will also create the `MyModule.js` file at the same time. Thus, any changes you make directly to `MyScript.js` or `MyModule.js` will be lost each time you run `npm test`.
