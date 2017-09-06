@@ -2,10 +2,10 @@ function getAttribute(name, options) {
   if(typeof options != 'object') options = false;
   options = options || {};
   if(options['alert'] == undefined) options['alert'] = true;
-  if(options['graphicid']){
+  if(options['graphicid']) {
     var graphic = getObj('graphic', options['graphicid']);
     if(graphic == undefined){
-      if(options['alert']){whisper('Graphic ' + options['graphicid'] + ' does not exist.');}
+      if(options['alert']) whisper('Graphic ' + options['graphicid'] + ' does not exist.');
       return undefined;
     }
 
@@ -14,7 +14,7 @@ function getAttribute(name, options) {
 
   if(options['characterid']){
     var character = getObj('character', options['characterid']);
-    if(character == undefined){
+    if(character == undefined) {
       if(options['alert']) whisper('Character ' + options['characterid'] + ' does not exist.');
       return undefined;
     }
@@ -26,12 +26,12 @@ function getAttribute(name, options) {
     });
     if(!attributes || attributes.length <= 0){
       if(options['setTo'] == undefined){
-        if(options['alert']){whisper(character.get('name') + ' does not have a(n) ' + name + ' Attribute.');
+        if(options['alert']) whisper(character.get('name') + ' does not have a(n) ' + name + ' Attribute.');
         return undefined;
       }
     } else if(attributes.length >= 2){
       if(options['alert']) whisper('There were multiple ' + name + ' attributes owned by ' + character.get('name')
-       + '. Using the first one found. A log has been posted in the terminal.');}
+       + '. Using the first one found. A log has been posted in the terminal.');
       log(character.get('name') + '\'s ' + name + ' Attributes');
       _.each(attributes, function(attribute){ log(attribute)});
     }

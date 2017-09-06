@@ -12,7 +12,7 @@ describe('whisper()', function() {
       expect(msg.target).to.equal('gm');
       done();
     });
-    whisper('private message', undefined, {MOCK20tag: 'whisper_gm'});
+    whisper('private message', {MOCK20tag: 'whisper_gm'});
   });
   it('should whisper to the given player id', function(done){
     var player = createObj('player', {_displayname: 'whisper player'}, {MOCK20override: true});
@@ -21,13 +21,13 @@ describe('whisper()', function() {
       expect(msg.target_name).to.equal(player.get('_displayname'));
       done();
     });
-    whisper('private message', player.id, {MOCK20tag: 'whisper_player'});
+    whisper('private message', {speakingTo: player.id, MOCK20tag: 'whisper_player'});
   });
   it('should be able to set speakingAs', function(done){
     on('chat:message:whisper_speakingAs', function(msg){
       expect(msg.who).to.equal('speaker');
       done();
     });
-    whisper('private message', undefined, {speakingAs: 'speaker', MOCK20tag: 'whisper_speakingAs'});
+    whisper('private message', {speakingAs: 'speaker', MOCK20tag: 'whisper_speakingAs'});
   });
 });

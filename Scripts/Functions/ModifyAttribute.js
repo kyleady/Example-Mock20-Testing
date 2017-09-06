@@ -1,8 +1,15 @@
 function modifyAttribute(attribute, options) {
   if (typeof options != 'object' ) options = {};
-  if(!options.workingWith) options.workingWith = 'current';
+  if(options.workingWith != 'max') options.workingWith = 'current';
   if(!options.sign) options.sign = '';
   if(typeof options.modifier == 'number') options.modifier = options.modifier.toString();
+
+  if(attribute.get) {
+    attribute = {
+      current: attribute.get('current'),
+      max: attribute.get('max')
+    };
+  }
 
   if(/\$\[\[\d+\]\]/.test(options.modifier)){
     var inlineMatch = options.modifier.match(/\$\[\[(\d+)\]\]/);
@@ -28,14 +35,17 @@ function modifyAttribute(attribute, options) {
       options.modifier = attribute.current;
       break;
   }
+
   var modifiedAttribute = {
     current: attribute.current,
     max: attribute.max
-  }
+  };
+
   modifiedAttribute[options.workingWith] = numModifier.calc(
     attribute[options.workingWith],
     options.operator,
     options.sign + options.modifier
   );
+
   return modifiedAttribute;
 }

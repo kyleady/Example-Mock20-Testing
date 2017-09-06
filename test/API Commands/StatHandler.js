@@ -115,10 +115,10 @@ describe('statHandler()', function() {
 		expect(attribute.get('current')).to.equal(34);
 		player.MOCK20chat('!attr Toughness -= 13', {MOCK20selected: [{_type: 'graphic', _id: graphic.id}]});
 		expect(attribute.get('current')).to.equal(21);
-		player.MOCK20chat('!attr Toughness *= 2', {MOCK20selected: [{_type: 'graphic', _id: graphic.id}]});
-		expect(attribute.get('current')).to.equal(42);
-		player.MOCK20chat('!attr Toughness /= 3', {MOCK20selected: [{_type: 'graphic', _id: graphic.id}]});
-		expect(attribute.get('current')).to.equal(14);
+		player.MOCK20chat('!attr Toughness *= 1.5', {MOCK20selected: [{_type: 'graphic', _id: graphic.id}]});
+		expect(attribute.get('current')).to.equal(32);
+		player.MOCK20chat('!attr Toughness /= 2.6', {MOCK20selected: [{_type: 'graphic', _id: graphic.id}]});
+		expect(attribute.get('current')).to.equal(12);
 	});
 	it('should allow any player to work with max values as well', function(){
 		Campaign().MOCK20reset();

@@ -1,4 +1,4 @@
-function statHandler(matches,msg,options){
+function attributeHandler(matches,msg,options){
   if(typeof options != 'object') options = {};
   if(options['show'] == undefined) options['show'] = true;
   var workingWith = (matches[1].toLowerCase() == 'max') ? 'max' : 'current';
@@ -19,9 +19,9 @@ function statHandler(matches,msg,options){
     if(attribute.max == undefined){
       if(modifier == 'max' && operator == '='){
         attributeValue(statName, {graphicid: graphic.id, delete: true, alert: false, bar: options['bar']});
-        return whisper(statName + ' has been reset.', msg.playerid, {gmEcho: true});
+        return whisper(statName + ' has been reset.', {speakingTo: msg.playerid, gmEcho: true});
       } else if(workingWith == 'max' || modifier == 'max') {
-        return whisper('Local attributes do not have maximums to work with.', {gmEcho: true});
+        return whisper('Local attributes do not have maximums to work with.', {speakingTo: msg.playerid, gmEcho: true});
       } else {
         attribute.max = '-';
       }
@@ -37,17 +37,17 @@ function statHandler(matches,msg,options){
     if(!modifiedAttribute) return;
     if(operator.indexOf('?') != -1) {
       if(options['show'] == false) return;
-      whisper(name + attributeTable(statName, modifiedAttribute), msg.playerid);
+      whisper(name + attributeTable(statName, modifiedAttribute), {speakingTo: msg.playerid});
     } else if(operator.indexOf('=') != -1) {
-      attributeValue(statName, {setTo: modifiedAttribute[workingWith], graphicid: graphic.id, max: workingWith == 'max', bar: options['bar']});
+      attributeValue(statName, {setTo: modifiedAttribute[workingWith], graphicid: graphic.id, max: workingWith, bar: options['bar']});
       if(options['show'] == false) return;
       var output = attributeTable(statName, attribute);
       output += attributeTable('|</caption><caption>V', modifiedAttribute, 'Yellow');
       if(options['partyStat']){
         var players = canViewAttr(statName, {alert: false});
-        whisper(name + output, players, {gmEcho: true});
+        whisper(name + output, {speakingTo: players, gmEcho: true});
       } else {
-        whisper(name + output, msg.playerid, {gmEcho: true});
+        whisper(name + output, {speakingTo: msg.playerid, gmEcho: true});
       }
     }
   });
@@ -57,7 +57,7 @@ function correctAttributeName(name){
   return name.trim();
 }
 
-function makeStatHandlerRegex(yourAttributes){
+function makeAttributeHandlerRegex(yourAttributes){
   var regex = "!\\s*";
   if(typeof yourAttributes == 'string'){
     yourAttributes = [yourAttributes];
@@ -79,15 +79,15 @@ function makeStatHandlerRegex(yourAttributes){
     return;
   }
   regex += "\\s*" + numModifier.regexStr();
-  regex += "\\s*(\\d*|max|current|\\$\\[\\[\\d\\]\\])";
+  regex += "\\s*(|\\d+\\.?\\d*|max|current|\\$\\[\\[\\d\\]\\])";
   regex += "\\s*$";
   return RegExp(regex, "i");
 };
 
 on("ready", function(){
-  var re = makeStatHandlerRegex();
+  var re = makeAttributeHandlerRegex();
   CentralInput.addCMD(re, function(matches, msg){
     matches[2] = correctAttributeName(matches[2]);
-    statHandler(matches, msg);
+    attributeHandler(matches, msg);
   }, true);
 });

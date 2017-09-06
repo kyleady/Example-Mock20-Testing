@@ -1,11 +1,14 @@
 var numModifier = {};
 numModifier.calc = function(stat, operator, modifier){
   if(operator.indexOf('+') != -1){
-    return Number(stat) + Number(modifier);
+    stat = Number(stat) + Number(modifier);
+    return Math.round(stat);
   } else if(operator.indexOf('-') != -1){
-    return Number(stat) - Number(modifier);
+    stat = Number(stat) - Number(modifier);
+    return Math.round(stat);
   } else if(operator.indexOf('*') != -1){
-    return Number(stat) * Number(modifier);
+    stat = Number(stat) * Number(modifier);
+    return Math.round(stat);
   } else if(operator.indexOf('/') != -1){
     stat = Number(stat) / Number(modifier);
     return Math.round(stat);

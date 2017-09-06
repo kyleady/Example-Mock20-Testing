@@ -1,6 +1,6 @@
 require('mock20')
 
-function statHandler(matches,msg,options){
+function attributeHandler(matches,msg,options){
   if(typeof options != 'object') options = {};
   if(options['show'] == undefined) options['show'] = true;
   var workingWith = (matches[1].toLowerCase() == 'max') ? 'max' : 'current';
@@ -21,9 +21,9 @@ function statHandler(matches,msg,options){
     if(attribute.max == undefined){
       if(modifier == 'max' && operator == '='){
         attributeValue(statName, {graphicid: graphic.id, delete: true, alert: false, bar: options['bar']});
-        return whisper(statName + ' has been reset.', msg.playerid, {gmEcho: true});
+        return whisper(statName + ' has been reset.', {speakingTo: msg.playerid, gmEcho: true});
       } else if(workingWith == 'max' || modifier == 'max') {
-        return whisper('Local attributes do not have maximums to work with.', {gmEcho: true});
+        return whisper('Local attributes do not have maximums to work with.', {speakingTo: msg.playerid, gmEcho: true});
       } else {
         attribute.max = '-';
       }
@@ -39,17 +39,17 @@ function statHandler(matches,msg,options){
     if(!modifiedAttribute) return;
     if(operator.indexOf('?') != -1) {
       if(options['show'] == false) return;
-      whisper(name + attributeTable(statName, modifiedAttribute), msg.playerid);
+      whisper(name + attributeTable(statName, modifiedAttribute), {speakingTo: msg.playerid});
     } else if(operator.indexOf('=') != -1) {
-      attributeValue(statName, {setTo: modifiedAttribute[workingWith], graphicid: graphic.id, max: workingWith == 'max', bar: options['bar']});
+      attributeValue(statName, {setTo: modifiedAttribute[workingWith], graphicid: graphic.id, max: workingWith, bar: options['bar']});
       if(options['show'] == false) return;
       var output = attributeTable(statName, attribute);
       output += attributeTable('|</caption><caption>V', modifiedAttribute, 'Yellow');
       if(options['partyStat']){
         var players = canViewAttr(statName, {alert: false});
-        whisper(name + output, players, {gmEcho: true});
+        whisper(name + output, {speakingTo: players, gmEcho: true});
       } else {
-        whisper(name + output, msg.playerid, {gmEcho: true});
+        whisper(name + output, {speakingTo: msg.playerid, gmEcho: true});
       }
     }
   });
@@ -59,7 +59,7 @@ function correctAttributeName(name){
   return name.trim();
 }
 
-function makeStatHandlerRegex(yourAttributes){
+function makeAttributeHandlerRegex(yourAttributes){
   var regex = "!\\s*";
   if(typeof yourAttributes == 'string'){
     yourAttributes = [yourAttributes];
@@ -81,16 +81,16 @@ function makeStatHandlerRegex(yourAttributes){
     return;
   }
   regex += "\\s*" + numModifier.regexStr();
-  regex += "\\s*(\\d*|max|current|\\$\\[\\[\\d\\]\\])";
+  regex += "\\s*(|\\d+\\.?\\d*|max|current|\\$\\[\\[\\d\\]\\])";
   regex += "\\s*$";
   return RegExp(regex, "i");
 };
 
 on("ready", function(){
-  var re = makeStatHandlerRegex();
+  var re = makeAttributeHandlerRegex();
   CentralInput.addCMD(re, function(matches, msg){
     matches[2] = correctAttributeName(matches[2]);
-    statHandler(matches, msg);
+    attributeHandler(matches, msg);
   }, true);
 });
 function LocalAttributes(graphic) {
@@ -132,9 +132,10 @@ function LocalAttributes(graphic) {
 function announce(content, options){
   if(typeof options != 'object') options = {};
   var speakingAs = options.speakingAs || 'API';
+  var callback = options.callback || null;
   if(options.noarchive == undefined) options.noarchive = true;
   if(!content) return whisper('announce() attempted to send an empty message.');
-  sendChat(speakingAs, content, null, options);
+  sendChat(speakingAs, content, callback, options);
 }
 function attributeTable(name, attribute, options){
   if(typeof options != 'object') options = {};
@@ -150,10 +151,10 @@ function attributeValue(name, options){
   if(typeof options != 'object') options = false;
   options = options || {};
   if(options['alert'] == undefined) options['alert'] = true;
-  if(options['max']){
-    var workingWith = 'max';
-  } else {
+  if(!options['max'] || options['max'] == 'current'){
     var workingWith = 'current';
+  } else {
+    var workingWith = 'max';
   }
 
   if(options['graphicid']){
@@ -235,7 +236,7 @@ CentralInput.input = function(msg){
   }
 
   if(!inputRecognized){
-    whisper('The command ' + msg.content + ' was not recognized. See ' + getLink('!help') + ' for a list of commands.', msg.playerid);
+    whisper('The command ' + msg.content + ' was not recognized. See ' + getLink('!help') + ' for a list of commands.', {speakingTo: msg.playerid});
   }
 }
 
@@ -297,14 +298,14 @@ function eachCharacter(msg, givenFunction){
       if(graphic == undefined) {
         log('graphic undefined')
         log(obj)
-        return whisper('graphic undefined');
+        return whisper('graphic undefined', {speakingTo: msg.playerid, gmEcho: true});
       }
 
       var character = getObj('character', graphic.get('represents'))
       if(character == undefined){
         log('character undefined')
         log(graphic)
-        return whisper('character undefined');
+        return whisper('character undefined', {speakingTo: msg.playerid, gmEcho: true});
       }
     } else if(obj._type == 'unique'){
       var graphic = undefined;
@@ -337,7 +338,7 @@ function eachCharacter(msg, givenFunction){
 
       if(graphic == undefined){
         return whisper(character.get('name') + ' does not have a token on any map in the entire campaign.',
-         msg.playerid, {gmEcho: true});
+         {speakingTo: msg.playerid, gmEcho: true});
       }
     } else if(typeof obj.get === 'function' && obj.get('_type') == 'graphic') {
       var graphic = obj;
@@ -345,12 +346,12 @@ function eachCharacter(msg, givenFunction){
       if(character == undefined){
         log('character undefined')
         log(graphic)
-        return whisper('character undefined');
+        return whisper('character undefined', {speakingTo: msg.playerid, gmEcho: true});
       }
     } else {
       log('Selected is neither a graphic nor a character.')
       log(obj)
-      return whisper('Selected is neither a graphic nor a character.');
+      return whisper('Selected is neither a graphic nor a character.', {speakingTo: msg.playerid, gmEcho: true});
     }
 
     givenFunction(character, graphic);
@@ -360,10 +361,10 @@ function getAttribute(name, options) {
   if(typeof options != 'object') options = false;
   options = options || {};
   if(options['alert'] == undefined) options['alert'] = true;
-  if(options['graphicid']){
+  if(options['graphicid']) {
     var graphic = getObj('graphic', options['graphicid']);
     if(graphic == undefined){
-      if(options['alert']){whisper('Graphic ' + options['graphicid'] + ' does not exist.');}
+      if(options['alert']) whisper('Graphic ' + options['graphicid'] + ' does not exist.');
       return undefined;
     }
 
@@ -372,7 +373,7 @@ function getAttribute(name, options) {
 
   if(options['characterid']){
     var character = getObj('character', options['characterid']);
-    if(character == undefined){
+    if(character == undefined) {
       if(options['alert']) whisper('Character ' + options['characterid'] + ' does not exist.');
       return undefined;
     }
@@ -384,12 +385,12 @@ function getAttribute(name, options) {
     });
     if(!attributes || attributes.length <= 0){
       if(options['setTo'] == undefined){
-        if(options['alert']){whisper(character.get('name') + ' does not have a(n) ' + name + ' Attribute.');
+        if(options['alert']) whisper(character.get('name') + ' does not have a(n) ' + name + ' Attribute.');
         return undefined;
       }
     } else if(attributes.length >= 2){
       if(options['alert']) whisper('There were multiple ' + name + ' attributes owned by ' + character.get('name')
-       + '. Using the first one found. A log has been posted in the terminal.');}
+       + '. Using the first one found. A log has been posted in the terminal.');
       log(character.get('name') + '\'s ' + name + ' Attributes');
       _.each(attributes, function(attribute){ log(attribute)});
     }
@@ -439,9 +440,16 @@ function getLink (Name, Link){
 }
 function modifyAttribute(attribute, options) {
   if (typeof options != 'object' ) options = {};
-  if(!options.workingWith) options.workingWith = 'current';
+  if(options.workingWith != 'max') options.workingWith = 'current';
   if(!options.sign) options.sign = '';
   if(typeof options.modifier == 'number') options.modifier = options.modifier.toString();
+
+  if(attribute.get) {
+    attribute = {
+      current: attribute.get('current'),
+      max: attribute.get('max')
+    };
+  }
 
   if(/\$\[\[\d+\]\]/.test(options.modifier)){
     var inlineMatch = options.modifier.match(/\$\[\[(\d+)\]\]/);
@@ -467,25 +475,31 @@ function modifyAttribute(attribute, options) {
       options.modifier = attribute.current;
       break;
   }
+
   var modifiedAttribute = {
     current: attribute.current,
     max: attribute.max
-  }
+  };
+
   modifiedAttribute[options.workingWith] = numModifier.calc(
     attribute[options.workingWith],
     options.operator,
     options.sign + options.modifier
   );
+
   return modifiedAttribute;
 }
 var numModifier = {};
 numModifier.calc = function(stat, operator, modifier){
   if(operator.indexOf('+') != -1){
-    return Number(stat) + Number(modifier);
+    stat = Number(stat) + Number(modifier);
+    return Math.round(stat);
   } else if(operator.indexOf('-') != -1){
-    return Number(stat) - Number(modifier);
+    stat = Number(stat) - Number(modifier);
+    return Math.round(stat);
   } else if(operator.indexOf('*') != -1){
-    return Number(stat) * Number(modifier);
+    stat = Number(stat) * Number(modifier);
+    return Math.round(stat);
   } else if(operator.indexOf('/') != -1){
     stat = Number(stat) / Number(modifier);
     return Math.round(stat);
@@ -499,9 +513,6 @@ numModifier.calc = function(stat, operator, modifier){
 numModifier.regexStr = function(){
   return '(\\?\\s*\\+|\\?\\s*-|\\?\\s*\\*|\\?\\s*\\/|\\?|=|\\+\\s*=|-\\s*=|\\*\\s*=|\\/\\s*=)\s*(|\\+|-)'
 }
-String.prototype.toTitleCase = function () {
-    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-};
 function trimToPerfectMatches(objs, phrase){
   var exactMatches = [];
   _.each(objs, function(obj){
@@ -520,37 +531,43 @@ function trimToPerfectMatches(objs, phrase){
     return objs;
   }
 }
-function whisper(content, speakingTo, options){
+function whisper(content, options){
   if(typeof options != 'object') options = {};
   var speakingAs = options.speakingAs || 'API';
   if(options.noarchive == undefined) options.noarchive = true;
   if(!content) return whisper('whisper() attempted to send an empty message.');
-  if (Array.isArray(speakingTo)) {
-    if (speakingTo.indexOf('all') != -1) return announce(content, options);
+  var new_options = {};
+  for(var k in options) new_options[k] = options[k];
+  delete new_options.speakingTo;
+  if (Array.isArray(options.speakingTo)) {
+    if (options.speakingTo.indexOf('all') != -1) return announce(content, new_options);
     if (options.gmEcho) {
       var gmIncluded = false;
-      _.each(speakingTo, function(target) {
+      _.each(options.speakingTo, function(target) {
         if (playerIsGM(target)) gmIncluded = true;
       });
-      if(!gmIncluded) whisper(content, false, options);
-      options.gmEcho = false;
+      if(!gmIncluded) whisper(content, new_options);
+      delete options.gmEcho;
     }
 
-    _.each(speakingTo, function(target) {
-      whisper(content, target, options);
+    _.each(options.speakingTo, function(target) {
+      new_options.speakingTo = target;
+      whisper(content, new_options);
     });
     return;
   }
 
-  if(speakingTo){
-    if(getObj('player', speakingTo)){
-      if(options.gmEcho && !playerIsGM(speakingTo)) whisper(content, false, options);
-      return sendChat(speakingAs, '/w \"' + getObj('player',speakingTo).get('_displayname') + '\" ' + content, null, options );
+  if(options.speakingTo == 'all') {
+    return announce(content, new_options);
+  } else if(options.speakingTo) {
+    if(getObj('player', options.speakingTo)){
+      if(options.gmEcho && !playerIsGM(options.speakingTo)) whisper(content, new_options);
+      return sendChat(speakingAs, '/w \"' + getObj('player',options.speakingTo).get('_displayname') + '\" ' + content, options.callback, options );
     } else {
-      return whisper('The playerid ' + speakingTo + ' was not recognized and the following msg failed to be delivered: ' + content);
+      return whisper('The playerid ' + JSON.stringify(options.speakingTo) + ' was not recognized and the following msg failed to be delivered: ' + content);
     }
   } else {
-    return sendChat(speakingAs, '/w gm ' + content, null, options);
+    return sendChat(speakingAs, '/w gm ' + content, options.callback, options);
   }
 }
 function canViewAttribute(name, options){

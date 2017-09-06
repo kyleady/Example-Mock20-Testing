@@ -22,14 +22,14 @@ function eachCharacter(msg, givenFunction){
       if(graphic == undefined) {
         log('graphic undefined')
         log(obj)
-        return whisper('graphic undefined');
+        return whisper('graphic undefined', {speakingTo: msg.playerid, gmEcho: true});
       }
 
       var character = getObj('character', graphic.get('represents'))
       if(character == undefined){
         log('character undefined')
         log(graphic)
-        return whisper('character undefined');
+        return whisper('character undefined', {speakingTo: msg.playerid, gmEcho: true});
       }
     } else if(obj._type == 'unique'){
       var graphic = undefined;
@@ -62,7 +62,7 @@ function eachCharacter(msg, givenFunction){
 
       if(graphic == undefined){
         return whisper(character.get('name') + ' does not have a token on any map in the entire campaign.',
-         msg.playerid, {gmEcho: true});
+         {speakingTo: msg.playerid, gmEcho: true});
       }
     } else if(typeof obj.get === 'function' && obj.get('_type') == 'graphic') {
       var graphic = obj;
@@ -70,12 +70,12 @@ function eachCharacter(msg, givenFunction){
       if(character == undefined){
         log('character undefined')
         log(graphic)
-        return whisper('character undefined');
+        return whisper('character undefined', {speakingTo: msg.playerid, gmEcho: true});
       }
     } else {
       log('Selected is neither a graphic nor a character.')
       log(obj)
-      return whisper('Selected is neither a graphic nor a character.');
+      return whisper('Selected is neither a graphic nor a character.', {speakingTo: msg.playerid, gmEcho: true});
     }
 
     givenFunction(character, graphic);

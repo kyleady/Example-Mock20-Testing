@@ -2,10 +2,10 @@ function attributeValue(name, options){
   if(typeof options != 'object') options = false;
   options = options || {};
   if(options['alert'] == undefined) options['alert'] = true;
-  if(options['max']){
-    var workingWith = 'max';
-  } else {
+  if(!options['max'] || options['max'] == 'current'){
     var workingWith = 'current';
+  } else {
+    var workingWith = 'max';
   }
 
   if(options['graphicid']){
