@@ -2,6 +2,8 @@
 
 An example [Roll20](https://roll20.net/) project that uses the [Mock20](https://github.com/kyleady/Mock20) module to test its scripts.
 
+For information on how [Mock20](https://github.com/kyleady/Mock20) was used, read below. For information on the project itself, see the [wiki](https://github.com/kyleady/Example-Mock20-Testing/wiki).
+
 # Usage
 
 #### Platform
