@@ -37,9 +37,5 @@ describe('modifyAttribute()', function() {
 		expect(modifyAttribute(attribute, {operator: 'nope', modifier: 1000}).current).to.equal(3);
 		expect(modifyAttribute(attribute, {operator: '????', modifier: 19, workingWith: 'max'}).max).to.equal(4);
 	});
-	/*
-	it('should be able to use an inline as a modifier', function(){
-
-	});
-	*/
+	it('should be able to use an inline as a modifier');
 });
