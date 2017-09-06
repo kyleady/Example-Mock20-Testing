@@ -2,7 +2,13 @@
 
 An example [Roll20](https://roll20.net/) project that uses the [Mock20](https://github.com/kyleady/Mock20) module to test its scripts.
 
+For information on how [Mock20](https://github.com/kyleady/Mock20) was used, read below. For information on the project itself, see the [wiki](https://github.com/kyleady/Example-Mock20-Testing/wiki).
+
 # Usage
+
+#### Platform
+
+`npm test` uses linux commands to compile the javascript files inside the `Scripts` folder into a new `MyScripts.js` file. You will either have to run `npm test` on a linux platform or through a linux terminal such as [Ubuntu for Windows](https://www.microsoft.com/en-us/store/p/ubuntu/9nblggh4msv6).
 
 #### npm test
 
